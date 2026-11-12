@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Purchase {
 
-    private int purchaseId;
+    private Integer purchaseId;
 
-    public int getPurchaseId() {
+    public Integer getPurchaseId() {
         return purchaseId;
     }
 
