@@ -1,4 +1,3 @@
-
 package com.tecnm.merida.market_backend.web.controller;
 
 import com.tecnm.merida.market_backend.domain.Product;
@@ -33,7 +32,6 @@ public class ProductController {
         return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
     }
 
-
     @GetMapping("/{id}")
     @Operation(summary = "Get product by ID",
             description = "Return a product by its ID if it exists")
@@ -53,6 +51,7 @@ public class ProductController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping("/category/{categoryId}")
     @Operation(summary = "Get products by category",
             description = "Return all products in a specific category")
     @ApiResponse(responseCode = "200",
@@ -63,19 +62,47 @@ public class ProductController {
             description = "Internal server error")
     public ResponseEntity<List<Product>> getByCategory(
             @Parameter(description = "Category ID",
-                    example = "7", required = true)
-            int categoryId){
+                    example = "1", required = true)
+            @PathVariable("categoryId") int categoryId) {
         return productService.getByCategory(categoryId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("")
+    @Operation(summary = "Create a new product",
+            description = "Save a new product in the catalog")
+    @ApiResponse(responseCode = "201",
+            description = "Product created successfully")
     public ResponseEntity<Product> save(@RequestBody Product product) {
         return new ResponseEntity<>(productService.save(product), HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}")
+    @Operation(summary = "Update an existing product",
+            description = "Update a product by its ID if it exists")
+    @ApiResponse(responseCode = "200",
+            description = "Product updated successfully")
+    @ApiResponse(responseCode = "404",
+            description = "Product not found")
+    public ResponseEntity<Product> update(
+            @Parameter(description = "ID of the product to be updated",
+                    example = "7",
+                    required = true)
+            @PathVariable("id") int productId,
+            @RequestBody Product product) {
+        return productService.update(productId, product)
+                .map(ResponseEntity::ok)
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a product by ID",
+            description = "Delete a product by its ID if it exists")
+    @ApiResponse(responseCode = "200",
+            description = "Product deleted successfully")
+    @ApiResponse(responseCode = "404",
+            description = "Product not found")
     public ResponseEntity<Void> delete(@PathVariable("id") int productId) {
         if (productService.delete(productId)) {
             return new ResponseEntity<>(HttpStatus.OK);

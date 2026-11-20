@@ -4,7 +4,6 @@ import com.tecnm.merida.market_backend.domain.Purchase;
 import com.tecnm.merida.market_backend.domain.repository.PurchaseRepository;
 import com.tecnm.merida.market_backend.persistence.crud.CompraCrudRepository;
 import com.tecnm.merida.market_backend.persistence.entity.Compra;
-import com.tecnm.merida.market_backend.persistence.entity.CompraProducto;
 import com.tecnm.merida.market_backend.persistence.mapper.PurchaseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -27,6 +26,11 @@ public class CompraRepository implements PurchaseRepository {
     }
 
     @Override
+    public Optional<Purchase> getPurchase(int purchaseId) {
+        return compraCrudRepository.findById(purchaseId).map(mapper::toPurchase);
+    }
+
+    @Override
     public Optional<List<Purchase>> getByClient(String clientId) {
         return compraCrudRepository.findByIdCliente(clientId)
                 .map(mapper::toPurchases);
@@ -35,7 +39,14 @@ public class CompraRepository implements PurchaseRepository {
     @Override
     public Purchase save(Purchase purchase) {
         Compra compra = mapper.toCompra(purchase);
-        compra.getProdustos().forEach(product -> product.setCompra(compra));
+        if (compra.getProdustos() != null) {
+            compra.getProdustos().forEach(product -> product.setCompra(compra));
+        }
         return mapper.toPurchase(compraCrudRepository.save(compra));
+    }
+
+    @Override
+    public void delete(int purchaseId) {
+        compraCrudRepository.deleteById(purchaseId);
     }
 }

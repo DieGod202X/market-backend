@@ -6,12 +6,18 @@ import java.util.List;
 public class Purchase {
 
     private Integer purchaseId;
+    private String clientId;
+    private LocalDateTime date;
+    private String paymentMethod;
+    private String comment;
+    private String state;
+    private List<PurchaseItem> items;
 
     public Integer getPurchaseId() {
         return purchaseId;
     }
 
-    public void setPurchaseId(int purchaseId) {
+    public void setPurchaseId(Integer purchaseId) {
         this.purchaseId = purchaseId;
     }
 
@@ -62,11 +68,4 @@ public class Purchase {
     public void setItems(List<PurchaseItem> items) {
         this.items = items;
     }
-
-    private String clientId;
-    private LocalDateTime date;
-    private String paymentMethod;
-    private String comment;
-    private String state;
-    private List<PurchaseItem> items;
 }

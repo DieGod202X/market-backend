@@ -1,18 +1,18 @@
 package com.tecnm.merida.market_backend.persistence.entity;
+
 import jakarta.persistence.*;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name= "clientes")
+@Table(name = "clientes")
 public class Cliente {
 
     @Id
-    private Integer id;
+    private String id;
     private String nombre;
     private String apellidos;
-    private String celular;
+    private BigDecimal celular;
     private String direccion;
 
     @OneToMany(mappedBy = "cliente")
@@ -21,11 +21,11 @@ public class Cliente {
     @Column(name = "correo_electronico")
     private String correoElectronico;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -45,11 +45,11 @@ public class Cliente {
         this.apellidos = apellidos;
     }
 
-    public String getCelular() {
+    public BigDecimal getCelular() {
         return celular;
     }
 
-    public void setCelular(String celular) {
+    public void setCelular(BigDecimal celular) {
         this.celular = celular;
     }
 

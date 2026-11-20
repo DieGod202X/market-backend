@@ -19,12 +19,14 @@ public interface ProductMapper {
             @Mapping(source = "cantidadStock", target = "stock"),
             @Mapping(source = "estado", target = "active"),
             @Mapping(source = "categoria", target = "category"),
-
     })
     Product toProduct(Producto producto);
     List<Product> toProducts(List<Producto> productos);
 
     @InheritInverseConfiguration
-    @Mapping (target ="codigoBarras", ignore = true)
+    @Mappings({
+            @Mapping(target = "codigoBarras", ignore = true),
+            @Mapping(target = "compraProdcutos", ignore = true)
+    })
     Producto toProducto(Product product);
 }
