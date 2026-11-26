@@ -9,6 +9,7 @@ public class Client {
     private BigDecimal phone;
     private String address;
     private String email;
+    private String password;
 
     public String getClientId() {
         return clientId;
@@ -56,5 +57,13 @@ public class Client {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

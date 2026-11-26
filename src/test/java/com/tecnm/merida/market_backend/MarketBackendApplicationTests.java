@@ -1,12 +1,16 @@
 package com.tecnm.merida.market_backend;
 
 import com.tecnm.merida.market_backend.domain.*;
+import com.tecnm.merida.market_backend.domain.dto.AuthenticationRequest;
+import com.tecnm.merida.market_backend.domain.dto.AuthenticationResponse;
 import com.tecnm.merida.market_backend.web.controller.*;
+import com.tecnm.merida.market_backend.web.security.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -31,12 +35,58 @@ class MarketBackendApplicationTests {
 	@Autowired
 	private PurchaseController purchaseController;
 
+	@Autowired
+	private AuthController authController;
+
+	@Autowired
+	private JwtUtil jwtUtil;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@Test
 	void contextLoads() {
 		assertNotNull(productController);
 		assertNotNull(categoryController);
 		assertNotNull(clientController);
 		assertNotNull(purchaseController);
+		assertNotNull(authController);
+		assertNotNull(jwtUtil);
+	}
+
+	@Test
+	void testJwtLoginAndValidation() {
+		// Create a client with plain password "1234" (ClientService encrypts it with BCrypt)
+		Client newClient = new Client();
+		newClient.setClientId("8888888");
+		newClient.setName("AuthUser");
+		newClient.setLastname("Test");
+		newClient.setPhone(new BigDecimal("9991112233"));
+		newClient.setAddress("Calle 60");
+		newClient.setEmail("auth@test.com");
+		newClient.setPassword("1234");
+		ResponseEntity<Client> savedRes = clientController.save(newClient);
+		assertEquals(HttpStatus.CREATED, savedRes.getStatusCode());
+		assertTrue(passwordEncoder.matches("1234", savedRes.getBody().getPassword()));
+
+		// Login with valid credentials
+		AuthenticationRequest loginReq = new AuthenticationRequest();
+		loginReq.setUsername("8888888");
+		loginReq.setPassword("1234");
+		ResponseEntity<AuthenticationResponse> loginRes = authController.login(loginReq);
+		assertEquals(HttpStatus.OK, loginRes.getStatusCode());
+		assertNotNull(loginRes.getBody());
+		String token = loginRes.getBody().getJwt();
+		assertNotNull(token);
+		assertTrue(jwtUtil.validateToken(token));
+		assertEquals("8888888", jwtUtil.extractUsername(token));
+
+		// Login with invalid password
+		AuthenticationRequest badReq = new AuthenticationRequest();
+		badReq.setUsername("8888888");
+		badReq.setPassword("wrong");
+		ResponseEntity<AuthenticationResponse> badRes = authController.login(badReq);
+		assertEquals(HttpStatus.UNAUTHORIZED, badRes.getStatusCode());
 	}
 
 	@Test
@@ -90,6 +140,7 @@ class MarketBackendApplicationTests {
 		newClient.setPhone(new BigDecimal("9991234567"));
 		newClient.setAddress("Calle 60 #100");
 		newClient.setEmail("juan@perez.com");
+		newClient.setPassword("1234");
 		ResponseEntity<Client> saveRes = clientController.save(newClient);
 		assertEquals(HttpStatus.CREATED, saveRes.getStatusCode());
 
